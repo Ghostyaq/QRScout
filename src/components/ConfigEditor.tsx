@@ -18,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Input } from './ui/input';
+import { useAutoUpdateTeamNumber } from './inputs/TeamNumberInput'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog'
 
 /**
  * Download a text file
@@ -46,7 +48,6 @@ function download(filename: string, text: string) {
  */
 function downloadConfig(formData: Config) {
   const configDownload = { ...formData };
-
   download('QRScout_config.json', JSON.stringify(configDownload));
 }
 
@@ -66,6 +67,12 @@ export function ConfigEditor(props: ConfigEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [url, setUrl] = useState<string>('');
+  const scheduleInputRef = useRef<HTMLInputElement>(null);
+  const [showScheduleUpload, setShowScheduleUpload] = useState(false);
+  const [schedulePreview, setSchedulePreview] = useState<string[]>([]);
+  const setScheduleFile = useQRScoutState.setState;
+  
+  useAutoUpdateTeamNumber(useQRScoutState(state => state.scheduleData));
 
   useEffect(() => {
     setCurrentConfigText(JSON.stringify(config, null, 2));
@@ -116,6 +123,47 @@ export function ConfigEditor(props: ConfigEditorProps) {
     }
   }, [url]);
 
+  const handleScheduleUploadClick = useCallback(() => {
+    scheduleInputRef.current?.click();
+  }, []);
+
+  const handleScheduleChange = useCallback(
+    (evt: React.ChangeEvent<HTMLInputElement>) => {
+      console.log("Handle Schedule Called.");
+
+      const file = evt.currentTarget.files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = (e.target?.result as string) ?? "";
+        
+        // Split lines, remove empty lines, trim each line
+        const lines = text
+          .split(/\r?\n/)
+          .map(l => l.trim())
+          .filter(l => l.length > 0);
+  
+        setSchedulePreview(lines.slice(0, 5)); // first 5 lines as preview
+  
+        // Parse CSV rows with trimmed cells
+        const rows = lines.map(l => l.split(",").map(cell => cell.trim()));
+  
+        if (rows.length < 2) {
+          console.warn("CSV seems to have no data rows.");
+          return;
+        }
+
+        setScheduleFile(prev => ({
+          ...prev,
+          scheduleFile: rows,
+        }));
+      };
+      reader.readAsText(file);
+    },
+    []
+  );
+  
   return (
     <div className="flex flex-col gap-2 h-full pb-2">
       <div className="flex-grow rounded-lg overflow-clip ">
@@ -176,6 +224,9 @@ export function ConfigEditor(props: ConfigEditorProps) {
               <DropdownMenuItem onClick={handleUploadClick}>
                 Upload Config
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setShowScheduleUpload(true)}>
+                Upload Match Schedule
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           
@@ -198,6 +249,50 @@ export function ConfigEditor(props: ConfigEditorProps) {
           />
         </div>
       </div>
+      {/* Match Schedule Upload Dialog */}
+      <Dialog open={showScheduleUpload} onOpenChange={setShowScheduleUpload}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Match Schedule</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3">
+            <Button variant="outline" onClick={handleScheduleUploadClick}>
+              <Upload className="h-4 w-4 mr-2" /> Select CSV
+            </Button>
+            <Input
+              type="file"
+              ref={scheduleInputRef}
+              onChange={handleScheduleChange}
+              className="hidden"
+              aria-hidden="true"
+              accept=".csv,text/csv"
+            />
+            {schedulePreview.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm font-semibold">Preview:</p>
+                <pre className="bg-gray-100 p-2 rounded">
+                  {schedulePreview.join("\n")}
+                </pre>
+              </div>
+            )}
+
+            {/* NEW Save Button */}
+            {schedulePreview.length > 0 && (
+              <Button
+                variant="default"
+                onClick={() => {
+                  // You can add any "final confirmation" logic here if needed
+                  console.log("Match schedule saved.");
+                  props.onCancel?.();
+                  setShowScheduleUpload(false); // close dialog
+                }}
+              >
+                <Save className="h-4 w-4 mr-2" /> Save
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
