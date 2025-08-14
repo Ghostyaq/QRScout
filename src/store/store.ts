@@ -79,6 +79,11 @@ export function getFieldValue(code: string) {
     ?.value;
 }
 
+export function getFieldValue(code: string) {
+  return useQRScoutState.getState().fieldValues.find(f => f.code === code)
+    ?.value;
+}
+
 export function resetFields() {
   window.dispatchEvent(new CustomEvent('resetFields', { detail: 'reset' }));
 }
