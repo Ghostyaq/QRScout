@@ -17,7 +17,7 @@ export interface ConfigurableInputProps {
 }
 
 export default function ConfigurableInput(props: ConfigurableInputProps) {
-  if (props.code === 'team') {
+  if (props.code === 'teamNumber') {
     return <TeamNumberInput key={props.code} />;
   }
   switch (props.type) {
