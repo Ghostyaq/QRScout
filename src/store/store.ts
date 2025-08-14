@@ -74,9 +74,14 @@ export function updateValue(code: string, data: any) {
   );
 }
 
-export function getFieldValue(code: string) {
-  return useQRScoutState.getState().fieldValues.find(f => f.code === code)
-    ?.value;
+/**
+ * Hook to get and subscribe to a specific field's value by its code.
+ * This ensures UI updates whenever that value changes in the store.
+ */
+export function useFieldValue<T = unknown>(code: string): T | undefined {
+  return useQRScoutState(
+    state => state.fieldValues.find(f => f.code === code)?.value as T | undefined
+  );
 }
 
 export function getFieldValue(code: string) {
