@@ -8,6 +8,8 @@ import SelectInput from './SelectInput';
 import StringInput from './StringInput';
 import TimerInput from './TimerInput';
 import MultiSelectInput from './MultiSelectInput';
+import { TeamNumberInput } from './TeamNumberInput';
+
 export interface ConfigurableInputProps {
   section: string;
   code: string;
@@ -15,6 +17,9 @@ export interface ConfigurableInputProps {
 }
 
 export default function ConfigurableInput(props: ConfigurableInputProps) {
+  if (props.code === 'team') {
+    return <TeamNumberInput key={props.code} />;
+  }
   switch (props.type) {
     case 'text':
       return <StringInput {...props} key={props.code} />;
