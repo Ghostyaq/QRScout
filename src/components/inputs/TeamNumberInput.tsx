@@ -4,7 +4,7 @@ import { useQRScoutState, updateValue, useFieldValue, getFieldValue } from '@/st
 
 export function TeamNumberInput() {
   const teamNumber = useQRScoutState(state => {
-    const field = state.fieldValues.find(f => f.code === 'team');
+    const field = state.fieldValues.find(f => f.code === 'teamNumber');
     return field?.value ?? '';
   });
 
