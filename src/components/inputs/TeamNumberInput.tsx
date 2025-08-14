@@ -12,7 +12,7 @@ export function TeamNumberInput() {
     <Input
       type="text"
       value={teamNumber}
-      onChange={e => updateValue('team', e.target.value)}
+      onChange={e => updateValue('teamNumber', e.target.value)}
       placeholder="Enter team number"
     />
   );
@@ -43,7 +43,7 @@ export function useAutoUpdateTeamNumber(rows: any[]) {
     const teamNumberRaw = matchRow[robotIndex] ?? "";
     const teamNumber = Number(teamNumberRaw);
 
-    updateValue("team", teamNumber);
+    updateValue("teamNumber", teamNumber);
   }, [
     rows,
     getFieldValue("robot"), // dependency: robot changes
