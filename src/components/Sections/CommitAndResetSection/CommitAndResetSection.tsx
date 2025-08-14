@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useQRScoutState } from '../../../store/store';
 import { Section } from '../../core/Section';
 import { ResetButton } from './ResetButton';
+import { useAutoUpdateTeamNumber } from '@/components/inputs/TeamNumberInput'
 
 export function CommitAndResetSection() {
   const formData = useQRScoutState(state => state.formData);
@@ -22,6 +23,9 @@ export function CommitAndResetSection() {
       .some(f => f.value === undefined || f.value === '' || f.value === null);
   }, [formData, fieldValues]);
 
+  const scheduleData = useQRScoutState(state => state.scheduleData);
+  useAutoUpdateTeamNumber(scheduleData);
+  
   return (
     <Section>
       <QRModal disabled={missingRequiredFields} />
