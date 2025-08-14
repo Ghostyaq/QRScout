@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { Menu, Save } from 'lucide-react';
+import { Menu, Save, Upload } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import schema from '../assets/schema.json';
 import {
