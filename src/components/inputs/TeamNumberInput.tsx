@@ -20,7 +20,7 @@ export function TeamNumberInput() {
 
 export function useAutoUpdateTeamNumber(rows: any[]) {
   const robotCode = String(useFieldValue("robot")).trim();
-  const matchCode = Number(useFieldValue("match"));
+  const matchCode = Number(useFieldValue("matchNumber"));
   
   useEffect(() => {
     if (!rows || rows.length === 0) return;
@@ -47,6 +47,6 @@ export function useAutoUpdateTeamNumber(rows: any[]) {
   }, [
     rows,
     getFieldValue("robot"), // dependency: robot changes
-    getFieldValue("match"), // dependency: match changes
+    getFieldValue("matchNumber"), // dependency: match changes
   ]);
 }
